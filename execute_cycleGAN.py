@@ -21,7 +21,7 @@ keras.backend.set_session(sess)
 from keras.models import load_model
 import pandas as pd
 from matplotlib import pyplot
-from imageProcessing.patches import image_to_patch, patch_to_image
+from imageProcessing.patches import image_to_patch, patch_to_image, save_patches
 from skimage.io import imread
 import ntpath
 import numpy as np
@@ -136,8 +136,8 @@ from keras_contrib.layers.normalization.instancenormalization import InstanceNor
 
 # load the models
 cust = {'InstanceNormalization': InstanceNormalization}
-model_AtoB = load_model(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/models/g_model_AtoB_164505.h5', cust)
-model_BtoA = load_model(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/models/g_model_BtoA_164505.h5', cust)
+model_AtoB = load_model('C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/cycleGAN/models/g_model_AtoB_119640.h5', cust)
+model_BtoA = load_model('C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/cycleGAN/models/g_model_BtoA_134595.h5', cust)
 
 df = pd.read_csv(path + '/data.csv')
 for i, item in df.iterrows():
@@ -149,6 +149,7 @@ for i, item in df.iterrows():
     src_mask_AtoB = imread(path + item[7])
     src_patch_AtoB = image_to_patch(src_img_AtoB, image_shape[0])
     gen_patch_AtoB = predict_patches(src_patch_AtoB, model_AtoB)
+#    save_patches(gen_patch_AtoB, image_shape, (ntpath.basename(item[0])).split('.png')[0], 'C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/cycleGAN/pred_HE_train/' )
     gen_image_AtoB = patch_to_image(gen_patch_AtoB, src_img_AtoB.shape, image_shape[0])
     gen_image_AtoB[src_mask_AtoB==0] = 255
     pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/results/'+ntpath.basename(item[2]), gen_image_AtoB)
@@ -186,3 +187,18 @@ for i, item in df.iterrows():
     gen_image = imread(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/results/'+ntpath.basename(item[2]))
     gen_image = remove_checkerboard(gen_image[:,:,0:3], patch_size = 256, radius = 3, method = 'linear')
     pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/results/postProcess/02_remove_checkerboard/'+ntpath.basename(item[2]), gen_image)
+    
+#%%
+# predict H&E patches and save
+patch_size= 256
+df = pd.read_csv(path + '/train.csv')
+for i, item in df.iterrows():
+    if i >= len(df):
+        break
+    src_img = imread('C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/' + item[0])
+    src_img = flip_contrast(src_img)
+    src_img =  scale_sample(src_img)
+    src_patch = image_to_patch(src_img[patch_size:src_img.shape[0]-patch_size, patch_size:src_img.shape[1]-patch_size], patch_size)  #image_to_patch(src_img, patch_size)  
+    gen_patch = predict_patches(src_patch, model_AtoB)
+    save_patches(gen_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], 'C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/cycleGAN/pred_HE_train/' )
+

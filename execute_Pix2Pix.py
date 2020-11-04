@@ -22,7 +22,7 @@ keras.backend.set_session(sess)
 from keras.models import load_model
 import pandas as pd
 from matplotlib import pyplot
-from imageProcessing.patches import image_to_patch, patch_to_image
+from imageProcessing.patches import image_to_patch, patch_to_image, save_patches
 from skimage.io import imread
 import ntpath
 import numpy as np
@@ -30,12 +30,12 @@ from utils.pix2pix import *
 from postProcess import *
 import time
 
-path = os.getcwd()
+path = "C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE"#os.getcwd()
 patch_size = 256
 
 #%%  
 # load image data
-dataset = load_real_samples(path+'/6_Pix2Pix_vs_cycleGAN/pix2pix/train.npz')
+dataset = load_real_samples(path+'/3_all_results/3_GeneratedHE_pix2pix_loss_mae/mm_256.npz')#'/6_Pix2Pix_vs_cycleGAN/pix2pix/train.npz'
 print('Loaded', dataset[0].shape, dataset[1].shape)
 # define input shape based on the loaded dataset
 image_shape = dataset[0].shape[1:]
@@ -52,23 +52,20 @@ train(d_model, g_model, gan_model, dataset)
 print("--- %s seconds ---" % (time.time() - t))
     
 #%%
-# predict, reconstruct and plot HE stain for all dataset
-model = load_model(path+'/6_Pix2Pix_vs_cycleGAN/pix2pix/models/model_047520.h5')
+# predict, reconstruct and plot HE stain image for all dataset
+model = load_model('C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/pix2pix/models/model_018300.h5') #model_047520
 
-df = pd.read_csv(path + '/data.csv')
+df = pd.read_csv(os.getcwd() + '/train.csv')
 for i, item in df.iterrows():
     if i >= len(df):
         break
-    src_img = imread(path + item[0])
-    src_img = flip_contrast(src_img)
+    src_img = imread('C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/' + item[0])
+    #src_img = flip_contrast(src_img)
     src_img =  scale_sample(src_img)
-    src_patch = image_to_patch(src_img, patch_size)  
-#    src_patch = scale_patches(src_patch)
+    src_patch = image_to_patch(src_img[patch_size:src_img.shape[0]-patch_size, patch_size:src_img.shape[1]-patch_size], patch_size)  #image_to_patch(src_img, patch_size)  
     gen_patch = predict_patches(src_patch, model)
-    gen_image = patch_to_image(gen_patch, src_img.shape, 256)
-    src_mask = imread(path + item[7])
-    gen_image[src_mask==0] = 255
-    pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/pix2pix/results/'+ntpath.basename(item[2]), gen_image)
-
-
-
+    save_patches(gen_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], 'C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/pix2pix/pred_HE_train/' )
+#    gen_image = patch_to_image(gen_patch, src_img.shape, 256)
+#    src_mask = imread(path + item[7])
+#    gen_image[src_mask==0] = 255
+#    pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/pix2pix/results/'+ntpath.basename(item[2]), gen_image)

@@ -12,9 +12,10 @@ import math
 import ntpath
 from skimage.measure import compare_ssim as ssim
 from skimage.color import rgb2lab
+import matplotlib.pyplot as plt
 
-path = os.getcwd()
-df = pd.read_csv(path + '/test.csv')
+path = "C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/"
+df = pd.read_csv(os.getcwd() + '/data.csv')
 
 def mse(imageA, imageB):
 	# the 'Mean Squared Error' between the two images is the
@@ -99,7 +100,7 @@ print('Pathological H&E --> Average MSE: {%.2f}, Average SSIM: {%.2f}, Average C
 print('Pix2Pix --> Average MSE: {%.2f}, Average SSIM: {%.2f}, Average CSS: {%.2f}' % (np.mean(mse_pix2pix), np.mean(ssim_pix2pix), np.mean(css_pix2pix)))
 print('CycleGAN --> Average MSE: {%.2f}, Average SSIM: {%.2f}, Average CSS: {%.2f}' % (np.mean(mse_cyclegan), np.mean(ssim_cyclegan), np.mean(css_cyclegan)))
 
-#%%
+#%% Save values in csv file
 df['Pix2Pix_MSE'] = mse_pix2pix 
 df['Pix2Pix_SSIM'] = ssim_pix2pix
 df['Pix2Pix_CSS'] = css_pix2pix
@@ -109,3 +110,56 @@ df['CycleGAN_SSIM'] = ssim_cyclegan
 df['CycleGAN_CSS'] = css_cyclegan 
 
 df.to_csv(path+'/6_Pix2Pix_vs_cycleGAN/quantitative_evaluation_test.csv', index=False)
+
+#%% make boxplot of all values
+
+from pylab import plot, show, savefig, xlim, figure, \
+                hold, ylim, legend, boxplot, setp, axes
+
+# function for setting the colors of the box plots pairs
+def setBoxColors(bp):
+    setp(bp['boxes'][0], color='blue')
+    setp(bp['caps'][0], color='blue')
+    setp(bp['caps'][1], color='blue')
+    setp(bp['whiskers'][0], color='blue')
+    setp(bp['whiskers'][1], color='blue')
+    setp(bp['medians'][0], color='blue')
+
+    setp(bp['boxes'][1], color='red')
+    setp(bp['caps'][2], color='red')
+    setp(bp['caps'][3], color='red')
+    setp(bp['whiskers'][2], color='red')
+    setp(bp['whiskers'][3], color='red')
+    setp(bp['medians'][1], color='red')
+    
+
+# Some fake data to plot
+A = [mse_pix2pix, ssim_pix2pix, css_pix2pix]
+B = [mse_cyclegan, ssim_cyclegan, css_cyclegan]
+
+fig, ([ax1, ax2, ax3]) = plt.subplots(1,3, figsize=(10,4))
+hold(True)
+
+# first boxplot pair
+bp = ax1.boxplot([mse_pix2pix, mse_cyclegan], positions = [1, 2], widths = 0.6)
+setBoxColors(bp)
+
+# second boxplot pair
+bp = ax2.boxplot([ssim_pix2pix, ssim_cyclegan], positions = [1, 2], widths = 0.6)
+setBoxColors(bp)
+
+# third boxplot pair
+bp = ax3.boxplot([css_pix2pix, css_cyclegan], positions = [1, 2], widths = 0.6)
+setBoxColors(bp)
+
+# set axes limits and labels
+ax1.set_xticklabels(['Pix2Pix', 'CycleGAN'])
+ax2.set_xticklabels(['Pix2Pix', 'CycleGAN'])
+ax3.set_xticklabels(['Pix2Pix', 'CycleGAN'])
+
+ax1.set_title("MSE")
+ax2.set_title("SSIM")
+ax3.set_title("CSS")
+
+savefig(path+'/6_Pix2Pix_vs_cycleGAN/boxcompare.png', dpi=300)
+show()

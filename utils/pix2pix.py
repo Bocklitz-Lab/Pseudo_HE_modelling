@@ -177,7 +177,7 @@ def define_gan(g_model, d_model, image_shape):
 	model = Model(in_src, [dis_out, gen_out])
 	# compile model
 	opt = Adam(lr=0.0002, beta_1=0.5)
-	model.compile(loss=['mse', 'mae'], optimizer=opt, loss_weights=[1,10])
+	model.compile(loss=['mse', 'mae'], optimizer=opt, loss_weights=[1,10])#'mae'
 	return model
 
 # load and prepare training images
@@ -449,3 +449,4 @@ def filter_patch_pair(src_patch, tar_patch, min_mean=200, min_std=100):
     idx, fil_tar_patch = filter_patches(tar_patch, min_mean=min_mean, min_std=min_std)
     fil_src_patch = src_patch[idx]
     return fil_src_patch, fil_tar_patch
+

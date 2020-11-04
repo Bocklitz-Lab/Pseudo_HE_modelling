@@ -21,10 +21,10 @@ from utils.pix2pix import normalize_intensity, scale_patches, square_root_img, f
 
 #%%
 # get path of the .csv file
-path = os.getcwd()
+path = 'C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE'
 
 # set the patch of save directory
-save_folder = path + '/6_Pix2Pix_vs_cycleGAN/pix2pix/'
+save_folder = 'C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/pix2pix/'
 
 # set the patch size
 patch_size = 256
@@ -45,7 +45,7 @@ def prep_data(mode):
         src_img, tar_img = imread(path + item[0]) , imread(path + item[6])
         
         # invert the contrast of source image
-        src_img = flip_contrast(src_img)
+#        src_img = flip_contrast(src_img)
         
         # remove the registration artefact on the edges from the target image
         xx =  tar_img.shape[0]-patch_size
@@ -60,8 +60,8 @@ def prep_data(mode):
         tar_patch = image_to_patch(tar_img[patch_size:xx, patch_size:yy], patch_size)  
         
         # save the target and source patches
-        save_patches(src_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], save_folder+ 'MM_train/' )
-        save_patches(tar_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], save_folder+ 'HE_train/' )
+        save_patches(src_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], save_folder+ 'org_MM_test/' )
+#        save_patches(tar_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], save_folder+ 'HE_test/' )
         
         # append the list of patches
         src_list.append(src_patch)
@@ -76,7 +76,7 @@ def prep_data(mode):
     return [src_list, tar_list, image_dim, image_ID]
 
 # load dataset
-[src_images, tar_images, dim, im_ID] = prep_data(path + '/train')
+[src_images, tar_images, dim, im_ID] = prep_data(os.getcwd() + '/test')
 print('Loaded: ', src_images.shape, tar_images.shape)
 
 # save as compressed numpy array
