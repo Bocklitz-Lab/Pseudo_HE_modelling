@@ -2,8 +2,12 @@
 """
 Created on Wed Sep 25 12:19:49 2019
 
-@author: si62qit
+@author: P.Pradhan
+
+This script has Pix2Pix model.
 """
+
+# import all packages
 import warnings
 warnings.filterwarnings("ignore")
 import os
@@ -15,6 +19,7 @@ K.set_image_dim_ordering('tf')
 K.set_image_data_format("channels_last")
 K.tensorflow_backend._get_available_gpus()
 
+# configure with GPU
 config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 56} ) 
 sess = tf.Session(config=config) 
 keras.backend.set_session(sess)
@@ -41,6 +46,7 @@ from numpy import vstack
 from numpy.random import randint
 from imageProcessing.patches import image_to_patch, patch_to_image, filter_patches
 
+# specify image size
 img_rows = img_cols = 256
 
 #%%
@@ -49,12 +55,8 @@ def scale_sample(X):
     sc_X = (X - 127.5) / 127.5
     return sc_X
 
+# Scale patches in the training data format
 def scale_patches(patches):
-    
-    """
-    Scale patches in the training data format
-    """
-    
     preprocessed_patches = []
     for i in range(len(patches)):
         p = scale_sample(patches[i])
@@ -371,24 +373,30 @@ def reconstruct_stain_image(X1, X2, model, image_dim= (5120, 5120, 3), patch_dim
     # plot all three images
     plot_image(src_image, gen_image, tar_image)
 
+# custom metric
 def total_loss(y_true, y_pred):
     return mean_absolute_error(y_true, y_pred) + total_variation_loss(y_pred)
 
+# custom metric
 def wasserstein_loss(y_true, y_pred):
     return K.mean(y_true*y_pred)
 
+# custom metric
 def perceptual_loss(y_true, y_pred):
     vgg = VGG16(include_top=False, weights='imagenet', input_shape=(256,256,3))
     loss_model = Model(inputs=vgg.input, outputs=vgg.get_layer('block3_conv3').output)
     loss_model.trainable = False
     return K.mean(K.square(loss_model(y_true) - loss_model(y_pred)))
 
+# custom metric
 def mean_absolute_error(y_true, y_pred):
     return K.mean(K.abs(y_pred - y_true), axis=-1)
 
+# custom metric
 def mean_square_error(y_true, y_pred):
     return K.mean(K.square(y_pred - y_true), axis=-1)
 
+# custom metric
 def total_variation_loss(y_pred):
     assert K.ndim(y_pred) == 4
     if K.image_data_format() == 'channels_first':
@@ -403,11 +411,13 @@ def total_variation_loss(y_pred):
             y_pred[:, :img_rows - 1, :img_cols - 1, :] - y_pred[:, :img_rows - 1, 1:, :])
     return K.sum(K.pow(a + b, 1.25))
 
+# custom metric
 def gram_matrix(x):
     features = K.batch_flatten(x)
     gram = K.dot(features, K.transpose(features))
     return gram
-#
+
+# custom metric
 def style_loss(style, combination):
     assert K.ndim(style) == 4
     assert K.ndim(combination) == 4
@@ -417,9 +427,11 @@ def style_loss(style, combination):
     size = img_rows * img_cols
     return K.sum(K.square(S - C)) / (4.0 * (channels ** 2) * (size ** 2))
 
+# custom metric
 def content_loss(base, combination):
     return K.sum(K.square(combination - base))
 
+# preprocessing of source image
 def normalize_intensity(src_img, method='max'):
     if method == 'max':
         src_img[:,:,0] = src_img[:,:,0]/np.max(src_img[:,:,0])
@@ -432,6 +444,7 @@ def normalize_intensity(src_img, method='max'):
         src_img[:,:,2] = src_img[:,:,2]/np.mean(src_img[:,:,2])
     return src_img
 
+# preprocessing of source image
 def square_root_img(src_img):
     src_img_sqr = np.zeros((src_img.shape[:3]), dtype=np.float64)
     src_img_sqr[:,:,0] = np.sqrt(src_img[:,:,0])
@@ -439,12 +452,14 @@ def square_root_img(src_img):
     src_img_sqr[:,:,2] = np.sqrt(src_img[:,:,2])
     return src_img_sqr
 
+# preprocessing of source image
 def flip_contrast(src_img):
     src_img[:,:,0] = 255 - src_img[:,:,0]
     src_img[:,:,1] = 255 - src_img[:,:,1]
     src_img[:,:,2] = 255 - src_img[:,:,2]
     return src_img
 
+# preprocessing of source image
 def filter_patch_pair(src_patch, tar_patch, min_mean=200, min_std=100):
     idx, fil_tar_patch = filter_patches(tar_patch, min_mean=min_mean, min_std=min_std)
     fil_src_patch = src_patch[idx]

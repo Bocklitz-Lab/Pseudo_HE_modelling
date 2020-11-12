@@ -2,8 +2,14 @@
 """
 Created on Tue Apr 14 13:34:16 2020
 
-@author: si62qit
+@author: P.Pradhan
+
+This script is used to make quantitative evaluation of the generated H&E images.
+The quantitative evaluation is based on MSE, CSS and SSIM.
+
 """
+
+# import all pacakages
 from skimage.io import imread
 import os
 import pandas as pd
@@ -14,13 +20,22 @@ from skimage.measure import compare_ssim as ssim
 from skimage.color import rgb2lab
 import matplotlib.pyplot as plt
 
+# get data directory
 path = "C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/"
+
+# get .csv file in the data directory
 df = pd.read_csv(os.getcwd() + '/data.csv')
 
 def mse(imageA, imageB):
-	# the 'Mean Squared Error' between the two images is the
+	""" The 'Mean Squared Error' between the two images is the
 	# sum of the squared difference between the two images;
 	# NOTE: the two images must have the same dimension
+    Args: 
+        imageA, imageB (numpy array): two images for which MSE metric 
+        needs to be calculated.
+    Returns:
+        err (float): MSE value  
+    """
 	err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
 	err /= float(imageA.shape[0] * imageA.shape[1])
 	
@@ -29,14 +44,37 @@ def mse(imageA, imageB):
 	return err
 
 def euclidean_distance(x,y):
+    """
+    This function calculates Euclidean distance between two vectors.
+    Args:
+        x,y (numpy array): Two vectors for which Euclidean distance needs to be 
+        calculated.
+    Returns:
+        distance (int): Euclidean distance value.   
+    """
     distance = math.sqrt(sum([(a - b) ** 2 for a, b in zip(x, y)]))
     return distance
 
-def calculateDistance(i1, i2):
-    return np.sum((i1-i2)**2)
+def calculateDistance(x,y):
+    """
+    This function calculates RMSE distance between two vectors.
+    Args:
+        x,y (numpy array): Two vectors for which RMSE distance needs to be 
+        calculated.
+    Returns:
+        distance (int): RMSE value.   
+    """
+    return np.sum((x-y)**2)
 
 def sim(x_lab, y_lab):
-    
+    """
+    This is utility function for calculating color_space_similarity index.
+    The formula for sim is give in the manuscript.
+    Args:
+        x_lab, y_lab (numpy array): Two image vectors in LAB space.
+    Returns:
+        sim (float): SIM value calculated using formula.
+    """
     dist_a = abs(x_lab[:,:,1].ravel()-y_lab[:,:,1].ravel())
     dist_b = abs(x_lab[:,:,2].ravel()-y_lab[:,:,2].ravel())
     
@@ -50,12 +88,23 @@ def sim(x_lab, y_lab):
     return np.concatenate((dist_a, dist_b), axis = 0)
 
 def color_space_similarity(x, y, threshold=0.5):
+    """
+    This function is used to calculate CSS metric between two images.
+    Args:
+        Args:
+        x,y (numpy array): Two vectors for which CSS needs to be calculated.
+    Returns:
+        CSS value.   
+    """
     x_lab = rgb2lab(x)
     y_lab = rgb2lab(y)
     sim_values = sim(x_lab, y_lab)
     sim_values = [xx if xx > threshold else 0 for xx in sim_values]
     return np.mean(sim_values)
 
+#%% Run this section to caluate all metrics between computational H&E image and 
+# histopathological H&E image.
+    
 mse_none = []
 mse_pix2pix = []
 mse_cyclegan = []
@@ -100,7 +149,8 @@ print('Pathological H&E --> Average MSE: {%.2f}, Average SSIM: {%.2f}, Average C
 print('Pix2Pix --> Average MSE: {%.2f}, Average SSIM: {%.2f}, Average CSS: {%.2f}' % (np.mean(mse_pix2pix), np.mean(ssim_pix2pix), np.mean(css_pix2pix)))
 print('CycleGAN --> Average MSE: {%.2f}, Average SSIM: {%.2f}, Average CSS: {%.2f}' % (np.mean(mse_cyclegan), np.mean(ssim_cyclegan), np.mean(css_cyclegan)))
 
-#%% Save values in csv file
+#%% Save all metric values in csv file
+
 df['Pix2Pix_MSE'] = mse_pix2pix 
 df['Pix2Pix_SSIM'] = ssim_pix2pix
 df['Pix2Pix_CSS'] = css_pix2pix
@@ -111,7 +161,7 @@ df['CycleGAN_CSS'] = css_cyclegan
 
 df.to_csv(path+'/6_Pix2Pix_vs_cycleGAN/quantitative_evaluation_test.csv', index=False)
 
-#%% make boxplot of all values
+#%% make boxplot of all metric values
 
 from pylab import plot, show, savefig, xlim, figure, \
                 hold, ylim, legend, boxplot, setp, axes

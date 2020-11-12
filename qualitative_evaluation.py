@@ -2,7 +2,10 @@
 """
 Created on Tue Apr  7 15:04:02 2020
 
-@author: si62qit
+@author: P.Pradhan
+
+This script is to generate subplot for qualitative evaluation in the manuscript.
+
 """
 
 from skimage.io import imread
@@ -102,7 +105,7 @@ for i, item in df.iterrows():
 fig.tight_layout()
 plt.savefig("C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/images/results/qualitative_evaluation.png", bbox_inches='tight', dpi=500)
 
-#%%
+#%% Save the cropped patches seperately in a folder.
 
 for i, item in df.iterrows():
     if i == 1:

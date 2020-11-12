@@ -2,8 +2,13 @@
 """
 Created on Mon Sep  9 15:30:51 2019
 
-@author: si62qit
+@author: P.Pradhan
+
+This script is used to train Pix2Pix model and use the trained model to predict
+images from test dataset.
 """
+
+# import all packages
 import warnings
 warnings.filterwarnings("ignore")
 import os
@@ -15,6 +20,7 @@ K.set_image_dim_ordering('tf')
 K.set_image_data_format("channels_last")
 K.tensorflow_backend._get_available_gpus()
 
+# config the script to run with GPU
 config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 56} ) 
 sess = tf.Session(config=config) 
 keras.backend.set_session(sess)
@@ -30,7 +36,10 @@ from utils.pix2pix import *
 from postProcess import *
 import time
 
+# get working directory
 path = "C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE"#os.getcwd()
+
+# input pacth size
 patch_size = 256
 
 #%%  
@@ -60,12 +69,12 @@ for i, item in df.iterrows():
     if i >= len(df):
         break
     src_img = imread('C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/' + item[0])
-    #src_img = flip_contrast(src_img)
+    src_img = flip_contrast(src_img)
     src_img =  scale_sample(src_img)
     src_patch = image_to_patch(src_img[patch_size:src_img.shape[0]-patch_size, patch_size:src_img.shape[1]-patch_size], patch_size)  #image_to_patch(src_img, patch_size)  
     gen_patch = predict_patches(src_patch, model)
     save_patches(gen_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], 'C:/Users/si62qit/Documents/PhDJenaPranita/pseudoHE/6_Pix2Pix_vs_cycleGAN/pix2pix/pred_HE_train/' )
-#    gen_image = patch_to_image(gen_patch, src_img.shape, 256)
-#    src_mask = imread(path + item[7])
-#    gen_image[src_mask==0] = 255
-#    pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/pix2pix/results/'+ntpath.basename(item[2]), gen_image)
+    gen_image = patch_to_image(gen_patch, src_img.shape, 256)
+    src_mask = imread(path + item[7])
+    gen_image[src_mask==0] = 255
+    pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/pix2pix/results/'+ntpath.basename(item[2]), gen_image)

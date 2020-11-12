@@ -2,8 +2,13 @@
 """
 Created on Wed Sep 25 15:14:00 2019
 
-@author: si62qit
+@author: P. Pradhan
+
+This script is used to train cycleCGAN model and use the trained model to predict
+images from test dataset.
 """
+
+# import all packages
 import warnings
 warnings.filterwarnings("ignore")
 import os
@@ -15,6 +20,7 @@ K.set_image_dim_ordering('tf')
 K.set_image_data_format("channels_last")
 K.tensorflow_backend._get_available_gpus()
 
+# config the script to run with GPU
 config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 56} ) 
 sess = tf.Session(config=config) 
 keras.backend.set_session(sess)
@@ -29,6 +35,7 @@ from utils.cycleGAN import *
 from postProcess import *
 import time
 
+# get working directory
 path = os.getcwd()
 
 # input shape
@@ -163,7 +170,7 @@ for i, item in df.iterrows():
     gen_image_BtoA[src_mask_AtoB==0] = 0
     pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/reconstructed/'+ntpath.basename(item[2]), gen_image_BtoA)
 
-#%% contrast adjust
+#%% Post-processing procedure: contrast adjust
 from PIL import Image, ImageEnhance
 df = pd.read_csv(path + '/data.csv')
 
@@ -178,7 +185,7 @@ for i, item in df.iterrows():
     im_output[mask==0] = 255
     pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/results/postProcess/01_reduce_contrast/'+ntpath.basename(item[2]), im_output)
 
-#%% remove checkerboard effect for generated images
+#%% Post-processing procedure: remove checkerboard effect for generated images
     
 df = pd.read_csv(path + '/data.csv')
 for i, item in df.iterrows():
@@ -188,8 +195,8 @@ for i, item in df.iterrows():
     gen_image = remove_checkerboard(gen_image[:,:,0:3], patch_size = 256, radius = 3, method = 'linear')
     pyplot.imsave(path+'/6_Pix2Pix_vs_cycleGAN/cycleGAN/results/postProcess/02_remove_checkerboard/'+ntpath.basename(item[2]), gen_image)
     
-#%%
-# predict H&E patches and save
+#%% predict H&E patches and save
+    
 patch_size= 256
 df = pd.read_csv(path + '/train.csv')
 for i, item in df.iterrows():

@@ -2,13 +2,15 @@
 """
 Created on Wed May 02 11:32:06 2018
 
-@author: si62qit
-"""
+@author: P.Pradhan
+
+This script is used to prepare data for pix2pix training. Run this script for 
+making patches of multimodal and Histopathology images, preprocessing the patches, 
+saving them in folders and making train.npz numpy array.
 
 """
-To create a .csv file of file names of images and labels. 
 
-"""
+# import all packages
 import warnings
 warnings.filterwarnings("ignore")
 import numpy as np
@@ -17,7 +19,7 @@ import pandas as pd
 import os
 from skimage.io import imread
 from imageProcessing.patches import image_to_patch, save_patches
-from utils.pix2pix import normalize_intensity, scale_patches, square_root_img, flip_contrast
+from utils.pix2pix import flip_contrast
 
 #%%
 # get path of the .csv file
@@ -45,7 +47,7 @@ def prep_data(mode):
         src_img, tar_img = imread(path + item[0]) , imread(path + item[6])
         
         # invert the contrast of source image
-#        src_img = flip_contrast(src_img)
+        src_img = flip_contrast(src_img)
         
         # remove the registration artefact on the edges from the target image
         xx =  tar_img.shape[0]-patch_size
@@ -61,7 +63,7 @@ def prep_data(mode):
         
         # save the target and source patches
         save_patches(src_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], save_folder+ 'org_MM_test/' )
-#        save_patches(tar_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], save_folder+ 'HE_test/' )
+        save_patches(tar_patch, (patch_size, patch_size, 3), (ntpath.basename(item[0])).split('.png')[0], save_folder+ 'HE_test/' )
         
         # append the list of patches
         src_list.append(src_patch)

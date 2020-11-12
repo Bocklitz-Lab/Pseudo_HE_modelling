@@ -2,9 +2,10 @@
 """
 Created on Thu Apr  9 16:56:19 2020
 
-@author: si62qit
+@author: P. Pradhan
 """
 
+# import all packages
 import warnings
 warnings.filterwarnings("ignore")
 import glob
@@ -12,11 +13,7 @@ import ntpath
 import csv
 from skimage.io import imread
 
-#%%
-
-"""
-Run this section to make csv file
-"""
+#%% Run this section to make csv file of the dataset
 
 imageD = 'C:/Users/si62qit/Documents/PhDJenaPranita/codesPython/HEstaining_GAN/2_BackgroundMask/*.png'
 

@@ -2,8 +2,12 @@
 """
 Created on Thu Apr  9 16:57:27 2020
 
-@author: si62qit
+@author: P.Pradhan
+
+This is basic script to crop histopathological images.
 """
+
+# import all packages
 import warnings
 warnings.filterwarnings("ignore")
 import numpy as np
@@ -11,11 +15,8 @@ import glob
 import matplotlib.pyplot as plt
 from skimage.io import imread
 
-#%%
-    
-"""
-Run this section to crop images
-"""
+#%%Run this section to crop images
+
 imageD = 'C:/Users/si62qit/Documents/PhDJenaPranita/codesPython/HEstaining_GAN/1_HE/*.png'
 
 def crop_image(img,tol=0):

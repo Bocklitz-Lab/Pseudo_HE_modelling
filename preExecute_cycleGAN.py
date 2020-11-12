@@ -2,26 +2,27 @@
 """
 Created on Thu Apr  9 16:59:33 2020
 
-@author: si62qit
+@author: P.Pradhan
+
+This script is used to prepare data for cycleCGAN training. Run this script for 
+making patches of multimodal and Histopathology images, preprocessing the patches, 
+saving them in folders and making train.npz numpy array.
+
 """
 
+# import all packages
 import warnings
 warnings.filterwarnings("ignore")
 import ntpath
 import pandas as pd
 import os
-import numpy as np
 from skimage.io import imread
-from imageProcessing.patches import image_to_patch, save_patches, filter_patches_homogeneity, filter_patches
-from utils.cycleGAN import normalize_intensity, scale_patches, square_root_img, flip_contrast
-import matplotlib.pyplot as plt
+from imageProcessing.patches import image_to_patch, save_patches, filter_patches_homogeneity
+from utils.cycleGAN import flip_contrast
 
-#%%
+#%% Make patches data for traing of cycleGAN model, use high resolution HE images. 
+# Save MM an HE patches for taining and testing dataset.
 
-"""
-Make patches data for cycleGAN, use high resolution HE images
-
-"""
 # get path of the .csv file
 path = os.getcwd()
 
@@ -43,11 +44,11 @@ def prep_data(mode):
         # invert the contrast of source image
         src_img = flip_contrast(src_img)
         
-#       generate patches of size 256*256 from source and target image
+        # generate patches of size 256*256 from source and target image
         src_patch = image_to_patch(src_img, patch_size)
         tar_patch = image_to_patch(tar_img, patch_size)
         
-#       filter patches with homogeneity factor
+        # filter patches with homogeneity factor
         src_patch = filter_patches_homogeneity(src_patch, homogeneity=0.60)
         tar_patch = filter_patches_homogeneity(tar_patch, homogeneity=0.60)
         
@@ -58,11 +59,8 @@ def prep_data(mode):
 
 prep_data(path + '/train') 
 
-#%%
-"""
-Prepare data for cycleGAN
+#%% Prepare data for cycleGAN and save train.npz
 
-"""
 # example of preparing the horses and zebra dataset
 from os import listdir
 from numpy import asarray

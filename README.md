@@ -21,9 +21,31 @@ Warnings
 Time
 
 ## Pre-requisite
-Install [imageProcessing](https://github.com/pranitapradhan91/imageProcessing.git), [Utils](https://github.com/pranitapradhan91/WP6_HE_modelling.git) and [postProcess](https://github.com/pranitapradhan91/WP6_HE_modelling.git) 
+Install [imageProcessing](https://github.com/pranitapradhan91/imageProcessing.git), [Utils](https://github.com/pranitapradhan91/WP6_HE_modelling.git) and [postProcess](https://github.com/pranitapradhan91/WP6_HE_modelling.git) packages
+
+## Execution
+1. Use make_csv.py can be used to make csv data file and adding all metadata.
+
+2. First use preExecute_cycleGAN.py and preExecute_pix2pix.py to generate patches afor training cycleCGAN and Pix2Pix model. This script will be used seperately for train.csv and test.csv. After executing this script a MM_train or MM_test, HE_train or HE_test folders with all patches is created. Using the patches from this folder train.npz matrix is created.
+
+3. Next is training of cycleCGAN and Pix2Pix models. This can be done using execute_cycleGAN.py and execute_Pix2Pix.py. These scripts initiate models from Utils package. 
+
+4. Scripts execute_cycleGAN.py and execute_Pix2Pix.py can be used to load pre-trained models to predict test dataset.
+
+5. Predictions can be post-processed also using scripts execute_cycleGAN.py and execute_Pix2Pix.py. The post-processing steps like removing patch-effect and contrast adjust of cycleCGAN generated images can be done by functions in postProcess.py.
+
+6. Qualitiative and quantitative evaluation is done using qualitative_evaluation.py and quantitative_evaluation.py. Quantitative evaluation calculates MSE, CSS and SSIM metrics. Qualitative evaluation is done by selecting some patches and plotting in subplots.
+
+## Dataset
+[Preprocessed images](https://hemospectrum.ipht-jena.de:8081/owncloud/index.php/s/M1DuCdxWe5HsXA2)
+
+[Pix2Pix numpy data](https://hemospectrum.ipht-jena.de:8081/owncloud/index.php/s/eZemDAoK6zRKv0j)
+
+[CycleCGAN numpy data](https://hemospectrum.ipht-jena.de:8081/owncloud/index.php/s/Rln1PT426yWtjyS)
 
 ## Pre-trained models
 [Pix2pix models](https://hemospectrum.ipht-jena.de:8081/owncloud/index.php/s/NOklxWMtg24j9Xr)
 
 [Cyclegan models](https://hemospectrum.ipht-jena.de:8081/owncloud/index.php/s/ZpfO0ioJuuLsCMM)
+
+[Results of Pix2Pix and cycleCGAN](https://hemospectrum.ipht-jena.de:8081/owncloud/index.php/s/VEc2AYF2xHD1GfX)

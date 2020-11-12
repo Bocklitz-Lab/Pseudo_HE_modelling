@@ -2,17 +2,23 @@
 """
 Created on Wed Apr 15 16:43:41 2020
 
-@author: si62qit
+@author: P.Pradhan
+
+This script was used to test remove_checkerboard function from postProcess.py 
 """
+
+# import all packages
 from postProcess import remove_checkerboard
 from skimage.io import imread
 import matplotlib.pyplot as plt
 import numpy as np
 
+# provide link of generated H&E image folder
 path = 'C:/Users/si62qit/Documents/PhDJenaPranita/codesPython/WP6_HE_modelling/6_Pix2Pix_vs_cycleGAN/cycleGAN/results_v2/'
 img = imread(path+'ID_003.png')
 
-#%%
+#%% Use a tile from an image and check different interpolation methods.
+
 img_1 = img[768:1280, 768:1280, :]
 plt.title("Original patch")
 plt.imshow(img_1)
@@ -47,7 +53,8 @@ plt.figure()
 plt.title("Linear, Radius 3")
 plt.imshow(post_img_1[:,:,0:3])
 
-#%%
+#%% Check remove_checkerboard function for whole image.
+
 patch_size = 256
 slice_size = 4*patch_size
 restored = np.zeros((img.shape[0], img.shape[1], img.shape[2]), dtype= np.uint8)    
